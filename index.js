@@ -1,23 +1,16 @@
 'use strict';
 
 const Koa = require('koa');
-const Router = require('@koa/router');
+const bodyParser = require('koa-bodyparser');
 
 const app = new Koa();
-const router = new Router();
 
-router.post('/register', async ctx => {
-  ctx.body = 'Register route';
-});
+// Body parser
+app.use(bodyParser());
 
-router.post('/login', async ctx => {
-  ctx.body = 'Login route';
-});
-
-router.post('/send', async ctx => {
-  ctx.body = 'Send route';
-});
-
-app.use(router.routes());
+// Routes
+app.use(require('./routes/login.js'));
+app.use(require('./routes/register'));
+app.use(require('./routes/send'));
 
 app.listen(3000, () => console.log('Server was successfully started!'));
