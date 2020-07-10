@@ -15,5 +15,10 @@
   "bugs": {
     "url": "https://github.com/inidzelsky/github-notifier/issues"
   },
-  "homepage": "https://github.com/inidzelsky/github-notifier#readme"
+  "homepage": "https://github.com/inidzelsky/github-notifier#readme",
+  "dependencies": {
+    "@koa/router": "^9.3.1",
+    "koa": "^2.13.0",
+    "koa-bodyparser": "^4.3.0"
+  }
 }
