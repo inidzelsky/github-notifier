@@ -16,20 +16,22 @@ const database = require(path.join(__dirname, '..', 'database', 'database'));
 const { saveUser } = database;
 
 // Set "multer" options
+const formatChecker =  (req, file, cb) => {
+  const filetypes = /png|gif|jpeg|jpg/;
+  const extCheck = filetypes
+    .test(path.extname(file.originalname).toLowerCase());
+  const mimeCheck = filetypes.test(file.mimetype);
+
+  if (extCheck && mimeCheck)
+    cb(null, true);
+  else
+    cb('Invalid picture format');
+};
+
 const storage = multer.diskStorage(multerStorage);
 const upload = multer({
   storage,
-  fileFilter: (req, file, cb) => { // #TODO Create separate checker function
-    const filetypes = /png|gif|jpeg|jpg/;
-    const extCheck = filetypes
-      .test(path.extname(file.originalname).toLowerCase());
-    const mimeCheck = filetypes.test(file.mimetype);
-
-    if (extCheck && mimeCheck)
-      cb(null, true);
-    else
-      cb('Invalid picture format');
-  }
+  fileFilter: formatChecker
 });
 
 const router = new Router();
@@ -37,18 +39,16 @@ const router = new Router();
 router.post('/register', upload.single('avatar'), async ctx => {
   try {
     const { email, password } = ctx.request.body;
-    const { filename } = ctx.request.file;
+    const avatarFileName = ctx.request.file.filename;
 
     // Create avatar and thumbnail file pathes
-    const ext = path.extname(filename);
-    const base = path.basename(filename, ext);
+    const ext = path.extname(avatarFileName);
+    const base = path.basename(avatarFileName, ext);
     const thumbnailFileName = `${base}_thumb${ext}`;
-    const avatarFilePath = path.join(avatarsPath, filename);
-    const thumbnailFilePath = path.join(thumbnailsPath, thumbnailFileName);
 
     // Create a thumbnail from the avatar
     await thumb({
-      source: avatarFilePath,
+      source: path.join(avatarsPath, avatarFileName),
       destination: thumbnailsPath,
       width: 100,
       quiet: true
@@ -59,7 +59,10 @@ router.post('/register', upload.single('avatar'), async ctx => {
     const hashPassword = await bcrypt.hash(password, salt);
 
     // Save user data to db
-    await saveUser(email, hashPassword, avatarFilePath, thumbnailFilePath);
+    await saveUser(email, hashPassword, avatarFileName, thumbnailFileName);
+
+    // Get user`s avatar url
+    const avatarUrl = path.join(ctx.request.host, avatarsPath);
 
     const payload = {
       user: {
@@ -68,7 +71,6 @@ router.post('/register', upload.single('avatar'), async ctx => {
       }
     };
 
-    //Creating token
     const token = jwt.sign(
       payload,
       jwtSecret,
@@ -76,13 +78,10 @@ router.post('/register', upload.single('avatar'), async ctx => {
         expiresIn: 360000
       });
 
-    const avatarUrl = `${ctx.request.host}/${avatarsPath}`;
-
-    ctx.body = {
+    return ctx.body = {
       token,
       avatarUrl
     };
-
   } catch(e) {
     console.log(e.message);
   }
