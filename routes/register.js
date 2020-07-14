@@ -11,10 +11,6 @@ const bcrypt = require('bcryptjs');
 const config = require(path.join(__dirname, '..', 'config'));
 const { jwtSecret, multerStorage, avatarsPath, thumbnailsPath } = config;
 
-// Get database functions
-const database = require(path.join(__dirname, '..', 'database', 'database'));
-const { saveUser } = database;
-
 // Set "multer" options
 const formatChecker =  (req, file, cb) => {
   const filetypes = /png|gif|jpeg|jpg/;
@@ -58,8 +54,7 @@ router.post('/register', upload.single('avatar'), async ctx => {
     const salt = await bcrypt.genSalt(10);
     const hashPassword = await bcrypt.hash(password, salt);
 
-    // Save user data to db
-    await saveUser(email, hashPassword, avatarFileName, thumbnailFileName);
+    // #TODO Save user into database
 
     // Get user`s avatar url
     const avatarUrl = path.join(ctx.request.host, avatarsPath);

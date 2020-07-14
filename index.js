@@ -9,8 +9,8 @@ const app = new Koa();
 app.use(bodyParser());
 
 // Routes
-app.use(require('./routes/login.js'));
-app.use(require('./routes/register'));
-app.use(require('./routes/send'));
+app.use(require('./routes/login.js').routes());
+app.use(require('./routes/register').routes());
+app.use(require('./routes/send').routes());
 
-app.listen(3000, () => console.log('Server was successfully started!'));
+app.listen(80, () => console.log('Server was successfully started!'));

@@ -8,4 +8,4 @@ router.post('/login', async ctx => {
   ctx.body = 'Login route';
 });
 
-module.exports = router.routes();
+module.exports = router;

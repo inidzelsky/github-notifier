@@ -17,9 +17,14 @@
   },
   "homepage": "https://github.com/inidzelsky/github-notifier#readme",
   "dependencies": {
+    "@koa/multer": "^3.0.0",
     "@koa/router": "^9.3.1",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^8.5.1",
     "koa": "^2.13.0",
-    "koa-bodyparser": "^4.3.0"
+    "koa-bodyparser": "^4.3.0",
+    "multer": "^1.4.2",
+    "node-thumbnail": "^0.15.0"
   },
   "devDependencies": {
     "nodemon": "^2.0.4"

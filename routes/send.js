@@ -8,4 +8,4 @@ router.post('/send', async ctx => {
   ctx.body = 'Send route';
 });
 
-module.exports = router.routes();
+module.exports = router;
