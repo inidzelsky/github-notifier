@@ -1,6 +1,7 @@
 'use strict';
 
-const users = [];
+const path = require('path');
+const query = require(path.join(__dirname, '..', 'database', 'dbController'));
 
 class User {
   constructor(email, password, avatarFileName, thumbnailFileName) {
@@ -10,8 +11,15 @@ class User {
     this.thumbnailFileName = thumbnailFileName;
   }
 
-  save() {
-    users.push(this);
+  async save() {
+    await query(
+      // eslint-disable-next-line max-len
+      'insert into users (email, password, avatar, thumbnail) values ($1, $2, $3, $4)',
+      [this.email, this.password, this.avatarFileName, this.thumbnailFileName]
+    );
+
+    const res = await query('select id from users where email=$1', [this.email]);
+    return res.rows[0].id;
   }
 
   static getAll() {
