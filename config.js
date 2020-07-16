@@ -3,6 +3,7 @@
 const path = require('path');
 
 module.exports = {
+  connectionString: 'postgresql://obismarck@localhost:5432/notifier',
   jwtSecret: 'jwtSecret',
   avatarsPath: 'public/avatars',
   thumbnailsPath: 'public/avatars/thumbnails',
