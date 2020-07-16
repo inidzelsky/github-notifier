@@ -10,6 +10,9 @@ const bcrypt = require('bcryptjs');
 const config = require(path.join(__dirname, '..', 'config'));
 const { jwtSecret, multerStorage, avatarsPath, thumbnailsPath } = config;
 
+//Get models
+const User = require(path.join(__dirname, '..', 'models', 'User'));
+
 // Set "multer" options
 const formatChecker =  (req, file, cb) => {
   const filetypes = /png|gif|jpeg|jpg/;
@@ -51,15 +54,13 @@ const registerUser = async ctx => {
     const salt = await bcrypt.genSalt(10);
     const hashPassword = await bcrypt.hash(password, salt);
 
-    // #TODO Save user into database
+    const user = new User(email, hashPassword, avatarFileName, thumbnailFileName);
 
-    // Get user`s avatar url
-    const avatarUrl = path.join(ctx.request.host, avatarsPath);
+    const userId = await user.save();
 
     const payload = {
       user: {
-        email,
-        password
+        id: userId
       }
     };
 
@@ -70,12 +71,18 @@ const registerUser = async ctx => {
         expiresIn: 360000
       });
 
+    // Get user`s avatar url
+    const avatarUrl = path.join(ctx.request.host, avatarsPath);
+
     return ctx.body = {
       token,
       avatarUrl
     };
   } catch(e) {
-    console.log(e.message);
+    ctx.status = e.status || 500;
+    ctx.body = { msg: e.message };
+
+    console.log(e);
   }
 };
 

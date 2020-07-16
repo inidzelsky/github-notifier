@@ -12,18 +12,38 @@ class User {
   }
 
   async save() {
+    // Check if user is already in db
+    let user = await User.findByEmail(this.email);
+    if (user) {
+      const e = new Error();
+      e.status = 400;
+      e.message = 'User already exists';
+
+      throw e;
+    }
+
+    // Insert a new user into db
+    const queryString = 'insert into users (email, password, avatar, thumbnail) values ($1, $2, $3, $4)';
     await query(
-      // eslint-disable-next-line max-len
-      'insert into users (email, password, avatar, thumbnail) values ($1, $2, $3, $4)',
+      queryString,
       [this.email, this.password, this.avatarFileName, this.thumbnailFileName]
     );
 
-    const res = await query('select id from users where email=$1', [this.email]);
-    return res.rows[0].id;
+    user = await User.findByEmail(this.email);
+    return user;
   }
 
-  static getAll() {
-    console.log(users);
+  static async findByEmail(email) {
+    const queryString = 'select * from users where email = $1';
+    const res = await query(
+      queryString,
+      [email]
+    );
+
+    if (res.rows.length)
+      return res.rows[0];
+
+    return null;
   }
 }
 
