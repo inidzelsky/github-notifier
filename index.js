@@ -9,7 +9,7 @@ const app = new Koa();
 app.use(bodyParser());
 
 // Routes
-app.use(require('./routes/login.js').routes());
+app.use(require('./routes/login').routes());
 app.use(require('./routes/register').routes());
 app.use(require('./routes/send').routes());
 

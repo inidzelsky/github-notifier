@@ -34,7 +34,11 @@ class User {
   }
 
   static async findByEmail(email) {
-    const queryString = 'select * from users where email = $1';
+    const queryString =
+      'select user_id as userid, email, password, avatar, thumbnail ' +
+      'from users ' +
+      'where email = $1';
+
     const res = await query(
       queryString,
       [email]

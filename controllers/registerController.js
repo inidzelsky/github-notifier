@@ -5,6 +5,7 @@ const multer = require('@koa/multer');
 const thumb = require('node-thumbnail').thumb;
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+const validator = require('validator');
 
 // Get config values
 const config = require(path.join(__dirname, '..', 'config'));
@@ -34,6 +35,9 @@ const upload = multer({
 
 const registerUser = async ctx => {
   try {
+    //Request data validation
+    validate(ctx.request.body.email, ctx.request.body.password, ctx.request.file);
+
     const { email, password } = ctx.request.body;
     const avatarFileName = ctx.request.file.filename;
 
@@ -54,13 +58,14 @@ const registerUser = async ctx => {
     const salt = await bcrypt.genSalt(10);
     const hashPassword = await bcrypt.hash(password, salt);
 
+    // Save user into the database
     const user = new User(email, hashPassword, avatarFileName, thumbnailFileName);
+    const { userId } = await user.save();
 
-    const userId = await user.save();
-
+    // Give token
     const payload = {
       user: {
-        id: userId
+        userId
       }
     };
 
@@ -85,6 +90,34 @@ const registerUser = async ctx => {
     console.log(e);
   }
 };
+
+const validate = (email, password, avatar) => {
+  const e = new Error();
+
+  if (!email || !password) {
+    e.status = 402;
+    e.message = (!email ? 'Email' : 'Password') + ' is not provided';
+    throw e;
+  }
+
+  if (!avatar) {
+    e.status = 402;
+    e.message = 'Avatar is not provided';
+    throw e;
+  }
+
+  if (!validator.isEmail(email)) {
+    e.status = 406;
+    e.message = 'Email is broken';
+    throw e;
+  }
+
+  if (!validator.isLength(password, { min: 6 })) {
+    e.status = 400;
+    e.message = 'Password is too short';
+    throw e;
+  }
+}
 
 module.exports = {
   uploadAvatar: upload,
