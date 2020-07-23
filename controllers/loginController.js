@@ -5,8 +5,14 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const validator = require('validator');
 
-const { jwtSecret } = require(path.join(__dirname, '..', 'config'));
+// Get config values
+const config = require(path.join(__dirname, '..', 'config'));
+const { jwtSecret, avatarsPath, thumbnailsPath } = config;
 
+// Get helper functions
+const { genError } = require(path.join(__dirname, '..', 'utils', 'utils'));
+
+// Get user model
 const User = require(path.join(__dirname, '..', 'models', 'User'));
 
 const loginUser = async ctx => {
@@ -19,10 +25,7 @@ const loginUser = async ctx => {
     // Get user from the db
     const user = await User.findByEmail(email);
     if (!user) {
-      const e = new Error();
-      e.status = 404;
-      e.message = 'User was not found';
-
+      const e = genError(404, 'User was not found');
       throw e;
     }
 
@@ -32,10 +35,7 @@ const loginUser = async ctx => {
     const hashPassword = user.password;
 
     if (!(await bcrypt.compare(password, hashPassword))) {
-      const e = new Error();
-      e.status = 401;
-      e.message = 'Invalid password';
-
+      const e = genError(401, 'Invalid password');
       throw e;
     }
 
@@ -53,14 +53,22 @@ const loginUser = async ctx => {
         expiresIn: 360000
       });
 
+    const avatarUrl = path.join(ctx.request.host, avatarsPath, avatar);
+    const thumbnailUrl = path.join(ctx.request.host, thumbnailsPath, thumbnail);
+
     ctx.body = {
-      avatarFileName: avatar,
-      thumbnailFileName: thumbnail,
+      avatarUrl,
+      thumbnailUrl,
       email,
       token
     };
   } catch(e) {
+    console.log(e.message);
+
     ctx.status = e.status || 500;
+
+    if (ctx.status === 500)
+      return ctx.body = { msg: 'Server error occured' };
     ctx.body = { msg: e.message };
   }
 };
@@ -69,20 +77,18 @@ const validate = (email, password) => {
   const e = new Error();
 
   if (!email || !password) {
-    e.status = 402;
-    e.message = (!email ? 'Email' : 'Password') + ' is not provided';
+    const message = (!email ? 'Email' : 'Password') + ' is not provided';
+    const e = genError(402, message);
     throw e;
   }
 
   if (!validator.isEmail(email)) {
-    e.status = 406;
-    e.message = 'Email is broken';
+    const e = genError(406, 'Email is broken');
     throw e;
   }
 
   if (!validator.isLength(password, { min: 6 })) {
-    e.status = 400;
-    e.message = 'Password is too short';
+    const e = genError(400, 'Password is too short');
     throw e;
   }
 }

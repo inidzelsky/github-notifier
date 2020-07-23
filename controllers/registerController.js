@@ -11,6 +11,9 @@ const validator = require('validator');
 const config = require(path.join(__dirname, '..', 'config'));
 const { jwtSecret, multerStorage, avatarsPath, thumbnailsPath } = config;
 
+// Get helper functions
+const { genError } = require(path.join(__dirname, '..', 'utils', 'utils'));
+
 //Get models
 const User = require(path.join(__dirname, '..', 'models', 'User'));
 
@@ -77,17 +80,22 @@ const registerUser = async ctx => {
       });
 
     // Get user`s avatar url
-    const avatarUrl = path.join(ctx.request.host, avatarsPath);
+    const avatarUrl = path.join(ctx.request.host, avatarsPath, avatarFileName);
+    const thumbnailUrl = path.join(ctx.request.host, thumbnailsPath, thumbnailFileName);
 
     return ctx.body = {
       token,
-      avatarUrl
+      avatarUrl,
+      thumbnailUrl
     };
   } catch(e) {
-    ctx.status = e.status || 500;
-    ctx.body = { msg: e.message };
+    console.log(e.message);
 
-    console.log(e);
+    ctx.status = e.status || 500;
+
+    if (ctx.status === 500)
+      return ctx.body = { msg: 'Server error occured' };
+    ctx.body = { msg: e.message };
   }
 };
 
@@ -95,26 +103,23 @@ const validate = (email, password, avatar) => {
   const e = new Error();
 
   if (!email || !password) {
-    e.status = 402;
-    e.message = (!email ? 'Email' : 'Password') + ' is not provided';
+    const message = (!email ? 'Email' : 'Password') + ' is not provided';
+    const e = genError(402, message);
     throw e;
   }
 
   if (!avatar) {
-    e.status = 402;
-    e.message = 'Avatar is not provided';
+    const e = genError(402, 'Avatar is not provided');
     throw e;
   }
 
   if (!validator.isEmail(email)) {
-    e.status = 406;
-    e.message = 'Email is broken';
+    const e = genError(406, 'Email is broken');
     throw e;
   }
 
   if (!validator.isLength(password, { min: 6 })) {
-    e.status = 400;
-    e.message = 'Password is too short';
+    const e = genError(400, 'Password  is too short');
     throw e;
   }
 }
