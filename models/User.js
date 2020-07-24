@@ -6,7 +6,7 @@ const path = require('path');
 const query = require(path.join(__dirname, '..', 'database', 'dbController'));
 
 // Get helper functions
-const { genError } = require(path.join(__dirname, '..', 'utils', 'utils'));
+const { genError } = require(path.join(__dirname, '..', 'helpers', 'error'));
 
 class User {
   constructor(email, password, avatarFileName, thumbnailFileName) {

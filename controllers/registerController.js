@@ -11,10 +11,10 @@ const config = require(path.join(__dirname, '..', 'config'));
 const { jwtSecret, multerStorage, avatarsPath, thumbnailsPath } = config;
 
 // Get helper functions
-const { genError } = require(path.join(__dirname, '..', 'utils', 'utils'));
+const { genError, handleError } = require(path.join(__dirname, '..', 'helpers', 'error'));
 
 // Get validator
-const validate = require(path.join(__dirname, '..', 'validators', 'login'));
+const validate = require(path.join(__dirname, '..', 'validators', 'register'));
 
 //Get models
 const User = require(path.join(__dirname, '..', 'models', 'User'));
@@ -43,6 +43,7 @@ const registerUser = async ctx => {
     //Request data validation
     validate(ctx.request.body.email, ctx.request.body.password, ctx.request.file);
 
+    // Get the request data
     const { email, password } = ctx.request.body;
     const avatarFileName = ctx.request.file.filename;
 
@@ -91,13 +92,7 @@ const registerUser = async ctx => {
       thumbnailUrl
     };
   } catch(e) {
-    console.log(e.message);
-
-    ctx.status = e.status || 500;
-
-    if (ctx.status === 500)
-      return ctx.body = { msg: 'Server error occured' };
-    ctx.body = { msg: e.message };
+    handleError(e, ctx);
   }
 };
 

@@ -13,10 +13,11 @@ const protectedMiddleware = async (ctx, next) => {
     }
 
     const { token } = ctx.request.body;
-    jwt.verify(token, jwtSecret);
+    await jwt.verify(token, jwtSecret);
 
     await next();
   } catch(e) {
+    console.log(e);
     ctx.status = 401;
     ctx.body = { msg: 'Token is wrong' };
   }

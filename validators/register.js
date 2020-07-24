@@ -3,28 +3,24 @@
 const path = require('path');
 const validator = require('validator');
 
-const  { genError } = require(path.join(__dirname, '..', 'utils', 'utils'));
+const  { genError } = require(path.join(__dirname, '..', 'helpers', 'error'));
 
 const validate = (email, password, avatar) => {
-  if (!email || !password) {
-    const message = (!email ? 'Email' : 'Password') + ' is not provided';
-    const e = genError(422, message);
-    throw e;
+  if (!avatar) {
+    throw genError(422, 'Avatar is not provided');
   }
 
-  if (!avatar) {
-    const e = genError(422, 'Avatar is not provided');
-    throw e;
+  if (!email || !password) {
+    const message = (!email ? 'Email' : 'Password') + ' is not provided';
+    throw genError(422, message);
   }
 
   if (!validator.isEmail(email)) {
-    const e = genError(422, 'Email is broken');
-    throw e;
+    throw genError(422, 'Email is broken');
   }
 
   if (!validator.isLength(password, { min: 6 })) {
-    const e = genError(422, 'Password  is too short');
-    throw e;
+    throw genError(422, 'Password  is too short');
   }
 };
 

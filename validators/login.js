@@ -3,7 +3,7 @@
 const path = require('path');
 const validator = require('validator');
 
-const  { genError } = require(path.join(__dirname, '..', 'utils', 'utils'));
+const  { genError } = require(path.join(__dirname, '..', 'helpers', 'error'));
 
 const validate = (email, password) => {
   if (!email || !password) {

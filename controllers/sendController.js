@@ -9,7 +9,7 @@ const config = require(path.join(__dirname, '..', 'config'));
 const { githubToken, openWeatherKey, transporterOptions } = config;
 
 // Get helper functions
-const { genError } = require(path.join(__dirname, '..', 'utils', 'utils'));
+const { genError, handleError } = require(path.join(__dirname, '..', 'helpers', 'error'));
 
 const sendController = async ctx => {
   try {
@@ -47,13 +47,7 @@ const sendController = async ctx => {
       result
     };
   } catch(e) {
-    console.log(e.message);
-
-    ctx.status = e.status || 500;
-
-    if (ctx.status === 500)
-      return ctx.body = { msg: 'Server error occured' };
-    ctx.body = { msg: e.message };
+    handleError(e, ctx);
   }
 };
 
@@ -101,9 +95,8 @@ const getUserInfo = async username => {
     const res = await axios.get(`https://api.github.com/users/${username}`, config);
     return res;
   } catch(e) {
-    if (e.response.status === 404) {
-      throw  (404, `User "${username}" was not found`);
-    }
+    if (e.response.status === 404)
+      throw genError(404, `User "${username}" was not found`);
 
     throw e;
   }

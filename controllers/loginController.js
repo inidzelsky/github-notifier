@@ -9,7 +9,7 @@ const config = require(path.join(__dirname, '..', 'config'));
 const { jwtSecret, avatarsPath, thumbnailsPath } = config;
 
 // Get helper functions
-const { genError } = require(path.join(__dirname, '..', 'utils', 'utils'));
+const { genError, handleError } = require(path.join(__dirname, '..', 'helpers', 'error'));
 
 //Get validator
 const validate = require(path.join(__dirname, '..', 'validators', 'login'));
@@ -63,13 +63,7 @@ const loginUser = async ctx => {
       token
     };
   } catch(e) {
-    console.log(e.message);
-
-    ctx.status = e.status || 500;
-
-    if (ctx.status === 500)
-      return ctx.body = { msg: 'Server error occured' };
-    ctx.body = { msg: e.message };
+    handleError(e, ctx);
   }
 };
 
