@@ -1,7 +1,12 @@
 'use strict';
 
 const path = require('path');
+
+// Get postgre query function
 const query = require(path.join(__dirname, '..', 'database', 'dbController'));
+
+// Get helper functions
+const { genError } = require(path.join(__dirname, '..', 'utils', 'utils'));
 
 class User {
   constructor(email, password, avatarFileName, thumbnailFileName) {
@@ -14,13 +19,9 @@ class User {
   async save() {
     // Check if user is already in db
     let user = await User.findByEmail(this.email);
-    if (user) {
-      const e = new Error();
-      e.status = 400;
-      e.message = 'User already exists';
+    if (user)
+      throw genError(409, 'User already exists');
 
-      throw e;
-    }
 
     // Insert a new user into db
     const queryString = 'insert into users (email, password, avatar, thumbnail) values ($1, $2, $3, $4)';
