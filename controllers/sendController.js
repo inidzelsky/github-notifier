@@ -6,7 +6,7 @@ const nodemailer = require('nodemailer');
 
 // Get config values
 const config = require(path.join(__dirname, '..', 'config'));
-const { githubToken, openWeatherKey } = config;
+const { githubToken, openWeatherKey, transporterOptions } = config;
 
 // Get helper functions
 const { genError } = require(path.join(__dirname, '..', 'utils', 'utils'));
@@ -21,6 +21,7 @@ const sendController = async ctx => {
     //Create user objects with the weather data
     users = await Promise.all(users.map(async user => {
       const { login, email, location } = user.data;
+
       let weather = null;
       if (email && location) {
         const response = await getWeather(location);
@@ -36,14 +37,7 @@ const sendController = async ctx => {
     }));
 
     // Set transporter options
-    const transporter = nodemailer.createTransport({
-      host: "smtp.mailtrap.io",
-      port: 2525,
-      auth: {
-        user: "d77c525e14cc68",
-        pass: "62affe1da0fc9b"
-      }
-    });
+    const transporter = nodemailer.createTransport(transporterOptions);
 
     // Send emails and get the reports
     const result = await Promise.all(users.map(user => sendEmail(transporter, user, text)));
@@ -58,9 +52,8 @@ const sendController = async ctx => {
     ctx.status = e.status || 500;
 
     if (ctx.status === 500)
-      ctx.body = { msg: 'Server error occured' };
-    else
-      ctx.body = { msg: e.message };
+      return ctx.body = { msg: 'Server error occured' };
+    ctx.body = { msg: e.message };
   }
 };
 
