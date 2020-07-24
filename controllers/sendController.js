@@ -109,8 +109,7 @@ const getUserInfo = async username => {
     return res;
   } catch(e) {
     if (e.response.status === 404) {
-      const error = genError(404, `User "${username}" was not found`);
-      throw error;
+      throw genError(404, `User "${username}" was not found`);
     }
 
     throw e;

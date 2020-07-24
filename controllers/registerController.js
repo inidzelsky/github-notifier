@@ -5,7 +5,6 @@ const multer = require('@koa/multer');
 const thumb = require('node-thumbnail').thumb;
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
-const validator = require('validator');
 
 // Get config values
 const config = require(path.join(__dirname, '..', 'config'));
@@ -13,6 +12,9 @@ const { jwtSecret, multerStorage, avatarsPath, thumbnailsPath } = config;
 
 // Get helper functions
 const { genError } = require(path.join(__dirname, '..', 'utils', 'utils'));
+
+// Get validator
+const validate = require(path.join(__dirname, '..', 'validators', 'login'));
 
 //Get models
 const User = require(path.join(__dirname, '..', 'models', 'User'));
@@ -98,31 +100,6 @@ const registerUser = async ctx => {
     ctx.body = { msg: e.message };
   }
 };
-
-const validate = (email, password, avatar) => {
-  const e = new Error();
-
-  if (!email || !password) {
-    const message = (!email ? 'Email' : 'Password') + ' is not provided';
-    const e = genError(402, message);
-    throw e;
-  }
-
-  if (!avatar) {
-    const e = genError(402, 'Avatar is not provided');
-    throw e;
-  }
-
-  if (!validator.isEmail(email)) {
-    const e = genError(406, 'Email is broken');
-    throw e;
-  }
-
-  if (!validator.isLength(password, { min: 6 })) {
-    const e = genError(400, 'Password  is too short');
-    throw e;
-  }
-}
 
 module.exports = {
   uploadAvatar: upload,

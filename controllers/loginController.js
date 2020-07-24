@@ -3,7 +3,6 @@
 const path = require('path');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const validator = require('validator');
 
 // Get config values
 const config = require(path.join(__dirname, '..', 'config'));
@@ -11,6 +10,9 @@ const { jwtSecret, avatarsPath, thumbnailsPath } = config;
 
 // Get helper functions
 const { genError } = require(path.join(__dirname, '..', 'utils', 'utils'));
+
+//Get validator
+const validate = require(path.join(__dirname, '..', 'validators', 'login'));
 
 // Get user model
 const User = require(path.join(__dirname, '..', 'models', 'User'));
@@ -25,8 +27,7 @@ const loginUser = async ctx => {
     // Get user from the db
     const user = await User.findByEmail(email);
     if (!user) {
-      const e = genError(404, 'User was not found');
-      throw e;
+      throw genError(404, 'User was not found');
     }
 
     const { userid, avatar, thumbnail } = user;
@@ -35,8 +36,7 @@ const loginUser = async ctx => {
     const hashPassword = user.password;
 
     if (!(await bcrypt.compare(password, hashPassword))) {
-      const e = genError(401, 'Invalid password');
-      throw e;
+      throw genError(401, 'Invalid password');
     }
 
     // Give token
@@ -72,26 +72,6 @@ const loginUser = async ctx => {
     ctx.body = { msg: e.message };
   }
 };
-
-const validate = (email, password) => {
-  const e = new Error();
-
-  if (!email || !password) {
-    const message = (!email ? 'Email' : 'Password') + ' is not provided';
-    const e = genError(402, message);
-    throw e;
-  }
-
-  if (!validator.isEmail(email)) {
-    const e = genError(406, 'Email is broken');
-    throw e;
-  }
-
-  if (!validator.isLength(password, { min: 6 })) {
-    const e = genError(400, 'Password is too short');
-    throw e;
-  }
-}
 
 module.exports = {
   loginUser
