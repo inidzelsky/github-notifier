@@ -4,9 +4,9 @@ const path = require('path');
 
 module.exports = {
   githubToken: process.env.GITHUBTOKEN, 
-  openWeatherKey: process.env.OPENWEATHERKEY, //'54191dab2f2f01f8c1db82baf2db5f78'
-  connectionString: process.env.CONNECTIONSTRING, //'postgresql://obismarck@localhost:5432/notifier'
-  jwtSecret: process.env.JWTSECRET, //'jwtSecret'
+  openWeatherKey: process.env.OPENWEATHERKEY,
+  connectionString: process.env.CONNECTIONSTRING,
+  jwtSecret: process.env.JWTSECRET,
   avatarsPath: 'public/avatars',
   thumbnailsPath: 'public/avatars/thumbnails',
   multerStorage: {
