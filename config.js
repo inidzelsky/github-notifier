@@ -3,7 +3,7 @@
 const path = require('path');
 
 module.exports = {
-  githubToken: process.env.GITHUBTOKEN, //'a3740f38476ed3ec180ed17c388e513453dfd02c'
+  githubToken: process.env.GITHUBTOKEN, 
   openWeatherKey: process.env.OPENWEATHERKEY, //'54191dab2f2f01f8c1db82baf2db5f78'
   connectionString: process.env.CONNECTIONSTRING, //'postgresql://obismarck@localhost:5432/notifier'
   jwtSecret: process.env.JWTSECRET, //'jwtSecret'
