@@ -35,7 +35,6 @@ const sendController = async ctx => {
         weather
       };
     }));
-
     // Set transporter options
     const transporter = nodemailer.createTransport(transporterOptions);
 
@@ -47,6 +46,7 @@ const sendController = async ctx => {
       result
     };
   } catch(e) {
+    console.log(e);
     handleError(e, ctx);
   }
 };
@@ -68,7 +68,7 @@ const sendEmail = async (transporter, user, text) => {
   }
 
   const info = await transporter.sendMail({
-    from: "github-notifier",
+    from: 'github.notifier0@gmail.com',
     to: user.email,
     subject: "Notifying",
     text: message

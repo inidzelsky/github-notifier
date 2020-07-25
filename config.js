@@ -3,10 +3,10 @@
 const path = require('path');
 
 module.exports = {
-  githubToken: 'YOUR GITHUB TOKEN',
-  openWeatherKey: 'YOUR OPENWEATHER KEY',
-  connectionString: 'YOUR POSTGRE CONNECTION STRING',
-  jwtSecret: 'YOUR JWT SECRET',
+  githubToken: process.env.GITHUBTOKEN, //'a3740f38476ed3ec180ed17c388e513453dfd02c'
+  openWeatherKey: process.env.OPENWEATHERKEY, //'54191dab2f2f01f8c1db82baf2db5f78'
+  connectionString: process.env.CONNECTIONSTRING, //'postgresql://obismarck@localhost:5432/notifier'
+  jwtSecret: process.env.JWTSECRET, //'jwtSecret'
   avatarsPath: 'public/avatars',
   thumbnailsPath: 'public/avatars/thumbnails',
   multerStorage: {
@@ -18,11 +18,12 @@ module.exports = {
     }
   },
   transporterOptions: {
-    host: 'smtp.mailtrap.io',
+    host: 'smtp.elasticemail.com',
     port: 2525,
+    secure: false,
     auth: {
-      user: 'YOUR USER',
-      pass: 'YOUR PASS'
+      user: process.env.EMAILUSER,
+      pass: process.env.EMAILPASS
     }
   },
 };
