@@ -10,12 +10,12 @@ const Register = () => {
   // Auth state
   const { email, password } = user;
 
+  // Avatar state
+  const [avatar, setAvatar] = useState(null);
+
   const onAuthChange = e => {
     setUser({...user, [e.target.name]: e.target.value});
   };
-
-  // Avatar state
-  const [avatar, setAvatar] = useState(null);
 
   const onAvatarChange = e => {
     setAvatar(e.target.files[0]);
@@ -37,6 +37,7 @@ const Register = () => {
       };
 
       const res = await axios.post('http://127.0.0.1/register', formData, config);
+      console.log(res.data);
     } catch(e) {
       console.error(e.message);
     }
@@ -44,6 +45,7 @@ const Register = () => {
 
   return (
     <div>
+      <h1>Register</h1>
       <form onSubmit={onSubmit}>
         <label>Avatar</label>
         <input name="avatar" type="file" onChange={onAvatarChange}/>

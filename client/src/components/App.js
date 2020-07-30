@@ -1,14 +1,34 @@
 import React from 'react';
+import {
+  BrowserRouter as Router,
+    Switch,
+    Route
+} from "react-router-dom";
 
 import '../styles/App.css';
 
+import Login from './auth/Login';
+import Register from './auth/Register';
+import Send from './pages/Send';
 
 const App = () => {
   return (
-    <div>
-      <h1>Hello, github-notifier!</h1>
-    </div>
-  )
-}
+    <Router>
+      <div>
+        <Switch>
+          <Route path='/register'>
+            <Register />
+          </Route>
+          <Route path='/login'>
+            <Login />
+          </Route>
+          <Route path='/send'>
+            <Send />
+          </Route>
+        </Switch>
+      </div>
+    </Router>
+  );
+};
 
 export default App;

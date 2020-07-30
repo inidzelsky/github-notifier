@@ -24,6 +24,7 @@ const Login = () => {
       };
 
       const res = await axios.post('http://127.0.0.1/login', user, config);
+      console.log(res.data);
     } catch(e) {
       console.error(e.message);
     }
@@ -31,6 +32,7 @@ const Login = () => {
 
   return (
     (<div>
+      <h1>Login</h1>
       <form onSubmit={onSubmit}>
         <label>Email</label>
         <input name="email" type="email" value={email}  onChange={onChange}/>
