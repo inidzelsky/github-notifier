@@ -7,6 +7,7 @@ import {
 
 import '../styles/App.css';
 
+import Navbar from './layout/Navbar';
 import Login from './auth/Login';
 import Register from './auth/Register';
 import Send from './pages/Send';
@@ -15,6 +16,7 @@ const App = () => {
   return (
     <Router>
       <div>
+        <Navbar />
         <Switch>
           <Route path='/register'>
             <Register />

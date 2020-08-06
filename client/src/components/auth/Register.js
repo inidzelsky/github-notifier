@@ -44,16 +44,22 @@ const Register = () => {
   };
 
   return (
-    <div>
+    <div className='container'>
       <h1>Register</h1>
       <form onSubmit={onSubmit}>
-        <label>Avatar</label>
-        <input name="avatar" type="file" onChange={onAvatarChange}/>
-        <label>Email</label>
-        <input name="email" type="email" value={email}  onChange={onAuthChange}/>
-        <label>Password</label>
-        <input name="password" type="password" value={password} onChange={onAuthChange}/>
-        <input type="submit" value="Submit"/>
+        <div className='form-group'>
+          <label>Avatar</label>
+          <input name="avatar" type="file" className='form-control-file' onChange={onAvatarChange}/>
+        </div>
+        <div className='form-group'>
+          <label>Email</label>
+          <input name="email" type="email" value={email} className='form-control' onChange={onAuthChange}/>
+        </div>
+        <div className='form-group'>
+          <label>Password</label>
+          <input name="password" type="password" value={password} className='form-control' onChange={onAuthChange}/>
+        </div>
+        <button type='submit' className='btn btn-primary'>Register</button>
       </form>
     </div>
   );

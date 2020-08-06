@@ -31,14 +31,18 @@ const Login = () => {
   };
 
   return (
-    (<div>
+    (<div className={'container'}>
       <h1>Login</h1>
       <form onSubmit={onSubmit}>
-        <label>Email</label>
-        <input name="email" type="email" value={email}  onChange={onChange}/>
-        <label>Password</label>
-        <input name="password" type="password" value={password} onChange={onChange}/>
-        <input type="submit" value="Submit"/>
+        <div className='form-group'>
+          <label>Email</label>
+          <input className={'form-control'} name="email" type="email" value={email}  onChange={onChange}/>
+        </div>
+        <div className='form-group'>
+          <label>Password</label>
+          <input className={'form-control'} name="password" type="password" value={password} onChange={onChange}/>
+        </div>
+        <button type="submit" className={'btn btn-primary'}>Login</button>
       </form>
     </div>)
   );

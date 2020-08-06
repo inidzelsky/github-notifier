@@ -35,23 +35,31 @@ const Send = () => {
   }
 
   return (
-    <div>
+    <div className='container'>
       <h1>Send</h1>
         <form onSubmit={onSubmit}>
-          <label>Token</label>
-          <input type={'text'} name={'token'} value={token} onChange={onChange(setToken)}/>
-          <label>Text</label>
-          <input type={'text'} name={'text'} value={text} onChange={onChange(setText)} />
-          <table>
-            <tbody>
-            <tr><th>Usernames:</th></tr>
-            {usernames.map(name => <tr><td>{name}</td></tr>)}
-            </tbody>
-          </table>
-          <label>New username:</label>
-          <input name={'username'} value={username} type={'text'} onChange={onChange(setUsername)}/>
-          <button onClick={onClick}>Add username</button>
-          <input type={'submit'} value={'Submit'}/>
+          <div className='form-group'>
+            <label>Token</label>
+            <input type={'text'} name={'token'} value={token} className='form-control' onChange={onChange(setToken)}/>
+          </div>
+          <div className='form-group'>
+            <label>Text</label>
+            <input type={'text'} name={'text'} value={text} className='form-control' onChange={onChange(setText)} />
+          </div>
+          <label>Usernames</label>
+          <div className='form-row'>
+            <div className='form-group col-6'>
+              <select multiple className='form-control'>
+                {usernames.map(u => <option>{u}</option>)}
+              </select>
+            </div>
+            <div className='form-group col-6'>
+              <input name={'username'} value={username} type={'text'} className='form-control mb-3' onChange={onChange(setUsername)}/>
+              <button className='btn btn-danger col-6'>Remove username</button>
+              <button onClick={onClick} className='btn btn-dark col-6'>Add username</button>
+            </div>
+          </div>
+          <button type='submit' className='btn btn-primary'>Send</button>
         </form>
     </div>
   );
