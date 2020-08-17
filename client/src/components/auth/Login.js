@@ -30,8 +30,8 @@ const Login = () => {
     }
   };
 
-  return (
-    (<div className={'container'}>
+  return(
+    <div className={'container'} style={{width: '500px'}}>
       <h1>Login</h1>
       <form onSubmit={onSubmit}>
         <div className='form-group'>
@@ -44,7 +44,7 @@ const Login = () => {
         </div>
         <button type="submit" className={'btn btn-primary'}>Login</button>
       </form>
-    </div>)
+    </div>
   );
 };
 

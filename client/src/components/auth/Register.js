@@ -44,12 +44,15 @@ const Register = () => {
   };
 
   return (
-    <div className='container'>
+    <div className='container' style={{width: '500px'}}>
       <h1>Register</h1>
       <form onSubmit={onSubmit}>
         <div className='form-group'>
           <label>Avatar</label>
-          <input name="avatar" type="file" className='form-control-file' onChange={onAvatarChange}/>
+          <div className='custom-file'>
+            <label htmlFor="avatar" className='custom-file-label'>Click to add your avatar</label>
+            <input name="avatar" type="file" className='custom-file-input' onChange={onAvatarChange}/>
+          </div>
         </div>
         <div className='form-group'>
           <label>Email</label>
