@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
+import Response from './Response';
+
 const Login = () => {
+  const [response, setResponse] = useState(null);
   const [user, setUser] = useState({
     email: '',
     password: ''
@@ -24,11 +27,20 @@ const Login = () => {
       };
 
       const res = await axios.post('http://127.0.0.1/login', user, config);
-      console.log(res.data);
+      setResponse(res.data);
     } catch(e) {
       console.error(e.message);
     }
   };
+
+  return(
+    response ? <Response data={response} /> : <LoginForm user={user} events={{onSubmit, onChange}}/>
+  );
+};
+
+const LoginForm = props => {
+  const { user: { email, password } } = props;
+  const { events: { onChange, onSubmit } } = props;
 
   return(
     <div className={'container'} style={{width: '500px'}}>
@@ -47,5 +59,7 @@ const Login = () => {
     </div>
   );
 };
+
+
 
 export default Login;

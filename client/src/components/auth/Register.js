@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
+import Response from './Response';
+
 const Register = () => {
+  const [response, setResponse] = useState(null);
   const [user, setUser] = useState({
     email: '',
     password: ''
@@ -19,7 +22,7 @@ const Register = () => {
 
   const onAvatarChange = e => {
     setAvatar(e.target.files[0]);
-  }
+  };
 
   const onSubmit = async e => {
     try {
@@ -37,11 +40,25 @@ const Register = () => {
       };
 
       const res = await axios.post('http://127.0.0.1/register', formData, config);
-      console.log(res.data);
+      setResponse(res.data);
     } catch(e) {
       console.error(e.message);
     }
-  };
+  }
+
+  return (response ?
+    <Response
+      data={response}
+    /> :
+    <RegisterForm
+      user={user}
+      events={{onAvatarChange, onAuthChange, onSubmit}}
+    />);
+};
+
+const RegisterForm = props => {
+  const { user: { email, password } } = props;
+  const { events: { onAvatarChange, onAuthChange, onSubmit } } = props;
 
   return (
     <div className='container' style={{width: '500px'}}>
@@ -66,6 +83,6 @@ const Register = () => {
       </form>
     </div>
   );
-};
+}
 
 export default Register;
