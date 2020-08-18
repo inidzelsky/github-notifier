@@ -12,6 +12,6 @@ const { sendController } =
 const router = new Router();
 
 
-router.post('/send', protectedMiddleware, sendController);
+router.post('/api/send', protectedMiddleware, sendController);
 
 module.exports = router;

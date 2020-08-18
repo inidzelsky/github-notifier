@@ -8,6 +8,6 @@ const { uploadAvatar, registerUser } =
 
 const router = new Router();
 
-router.post('/register', uploadAvatar.single('avatar'), registerUser);
+router.post('/api/register', uploadAvatar.single('avatar'), registerUser);
 
 module.exports = router;
