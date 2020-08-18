@@ -5,8 +5,12 @@ require('dotenv').config();
 
 const Koa = require('koa');
 const bodyParser = require('koa-bodyparser');
+const cors = require('@koa/cors');
 
 const app = new Koa();
+
+//CORS
+app.use(cors());
 
 // Body parser
 app.use(bodyParser());
