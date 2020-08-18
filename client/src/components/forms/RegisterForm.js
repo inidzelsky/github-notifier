@@ -38,7 +38,7 @@ const RegisterForm = props => {
         }
       };
 
-      const res = await axios.post('http://127.0.0.1/register', formData, config);
+      const res = await axios.post('http://127.0.0.1/api/register', formData, config);
       setResponse(res.data);
     } catch(e) {
       console.error(e.message);

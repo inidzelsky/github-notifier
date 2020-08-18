@@ -58,7 +58,7 @@ const SendForm = props => {
         usernames
       };
 
-      const res = await axios.post('http://127.0.0.1/send', formData, config);
+      const res = await axios.post('http://127.0.0.1/api/send', formData, config);
       setResponse(res.data);
     } catch(e) {
       console.error(e.message);

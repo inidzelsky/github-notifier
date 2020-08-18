@@ -28,7 +28,7 @@ const LoginForm = props => {
         }
       };
 
-      const res = await axios.post('http://127.0.0.1/login', user, config);
+      const res = await axios.post('http://127.0.0.1/api/login', user, config);
       setResponse(res.data);
     } catch(e) {
       console.error(e.message);
