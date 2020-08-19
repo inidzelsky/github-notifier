@@ -1,12 +1,5 @@
 'use strict';
 
-const genError = (status, message) => {
-  const e = new Error();
-  e.status = status;
-  e.message = message;
-  return e;
-};
-
 const handleError = (e, ctx) => {
   const status = e.status || 500;
 
@@ -26,6 +19,5 @@ const handleError = (e, ctx) => {
 };
 
 module.exports = {
-  genError,
   handleError
 };

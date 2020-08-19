@@ -19,15 +19,15 @@ const User = require(path.join(__dirname, '..', 'models', 'User'));
 
 const loginUser = async ctx => {
   try {
-    // Request data validation
-    validate(ctx.request.body.email, ctx.request.body.password);
-
     const { email, password } = ctx.request.body;
+
+    // Request data validation
+    validate({ email, password }, ctx);
 
     // Get user from the db
     const user = await User.findByEmail(email);
     if (!user) {
-      throw genError(404, 'User was not found');
+      ctx.throw(404, 'User was not found');
     }
 
     const { userid, avatar, thumbnail } = user;
@@ -36,7 +36,7 @@ const loginUser = async ctx => {
     const hashPassword = user.password;
 
     if (!(await bcrypt.compare(password, hashPassword))) {
-      throw genError(401, 'Invalid password');
+      ctx.throw(401, 'Invalid password');
     }
 
     // Give token

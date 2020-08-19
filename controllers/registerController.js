@@ -11,7 +11,7 @@ const config = require(path.join(__dirname, '..', 'config'));
 const { jwtSecret, multerStorage, avatarsPath, thumbnailsPath } = config;
 
 // Get helper functions
-const { genError, handleError } = require(path.join(__dirname, '..', 'helpers', 'error'));
+const { handleError } = require(path.join(__dirname, '..', 'helpers', 'error'));
 
 // Get validator
 const validate = require(path.join(__dirname, '..', 'validators', 'register'));
@@ -40,12 +40,10 @@ const upload = multer({
 
 const registerUser = async ctx => {
   try {
-    //Request data validation
-    validate(ctx.request.body.email, ctx.request.body.password, ctx.request.file);
+    const { body: { email, password }, file } = ctx.request;
 
-    // Get the request data
-    const { email, password } = ctx.request.body;
-    const avatarFileName = ctx.request.file.filename;
+    //Request data validation
+    validate({ email, password, file }, ctx);
 
     // Create avatar and thumbnail file pathes
     const ext = path.extname(avatarFileName);
@@ -88,6 +86,7 @@ const registerUser = async ctx => {
 
     return ctx.body = {
       token,
+      email,
       avatarUrl,
       thumbnailUrl
     };

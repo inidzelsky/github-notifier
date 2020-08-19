@@ -1,5 +1,4 @@
 'use strict';
-
 const path = require('path');
 const axios = require('axios');
 const nodemailer = require('nodemailer');
@@ -9,11 +8,17 @@ const config = require(path.join(__dirname, '..', 'config'));
 const { githubToken, openWeatherKey, transporterOptions } = config;
 
 // Get helper functions
-const { genError, handleError } = require(path.join(__dirname, '..', 'helpers', 'error'));
+const { handleError } = require(path.join(__dirname, '..', 'helpers', 'error'));
+
+// Get validator
+const validate = require(path.join(__dirname, '..', 'validators', 'send'));
 
 const sendController = async ctx => {
   try {
     const { usernames, text } = ctx.request.body;
+
+    // Request data validation
+    validate({ text, usernames }, ctx);
 
     // Fetch github email and location data by nickname
     let users = await Promise.all(usernames.map(getUserInfo));
@@ -92,11 +97,12 @@ const getUserInfo = async username => {
       }
     };
 
-    const res = await axios.get(`https://api.github.com/users/${username}`, config);
+    const url = `https://api.github.com/users/${username}`;
+    const res = await axios.get(url, config);
     return res;
   } catch(e) {
-    if (e.response.status === 404)
-      throw genError(404, `User "${username}" was not found`);
+    if (e.response && e.response.status === 404)
+      ctx.throw(404, `User "${username} was not found"`);
 
     throw e;
   }
