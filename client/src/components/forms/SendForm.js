@@ -23,7 +23,9 @@ const SendForm = props => {
     setCurrentUsername(e.target.value);
   }
 
-  const onAddClick = () => {
+  const onAddClick = e => {
+    e.preventDefault();
+
     if (username.trim() === '')
       return;
 
@@ -31,7 +33,9 @@ const SendForm = props => {
     setUsername('');
   };
 
-  const onRemoveClick = () => {
+  const onRemoveClick = e => {
+    e.preventDefault();
+
     if (currentUsername === null)
       return;
 

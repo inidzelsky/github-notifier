@@ -4,7 +4,7 @@ const Result = props => {
   const { result } = props;
 
   return (
-    <div className='container mt-sm-3' style={{width: '750px'}}>
+    <div className='container mt-sm-3' style={{width: '1000px'}}>
       <h1 className='text-center'>Result</h1>
       <table className='table table-striped table-bordered mt-sm-3'>
         <thead>
