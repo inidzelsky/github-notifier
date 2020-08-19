@@ -1,7 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import axios from 'axios';
 
+import AlertContext from '../../context/alert/AlertContext';
+
 const SendForm = props => {
+  const alertContext = useContext(AlertContext);
+  const { setAlert } = alertContext;
+
   const { setResponse } = props;
 
   const [token, setToken] = useState('');
@@ -18,7 +23,9 @@ const SendForm = props => {
     setCurrentUsername(e.target.value);
   }
 
-  const onAddClick = () => {
+  const onAddClick = e => {
+    e.preventDefault();
+
     if (username.trim() === '')
       return;
 
@@ -26,7 +33,9 @@ const SendForm = props => {
     setUsername('');
   };
 
-  const onRemoveClick = () => {
+  const onRemoveClick = e => {
+    e.preventDefault();
+
     if (currentUsername === null)
       return;
 
@@ -58,9 +67,12 @@ const SendForm = props => {
         usernames
       };
 
-      const res = await axios.post('http://127.0.0.1/send', formData, config);
+      const res = await axios.post('http://127.0.0.1/api/send', formData, config);
       setResponse(res.data);
     } catch(e) {
+      const { msg } = e.response.data;
+      setAlert({type: 'danger', msg});
+
       console.error(e.message);
     }
   };

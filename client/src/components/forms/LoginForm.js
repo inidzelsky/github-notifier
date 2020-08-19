@@ -1,7 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import axios from "axios";
 
+import AlertContext from '../../context/alert/AlertContext';
+
 const LoginForm = props => {
+  const alertContext = useContext(AlertContext);
+  const { setAlert } = alertContext;
+
   const { setResponse } = props;
 
   const [user, setUser] = useState({
@@ -28,9 +33,12 @@ const LoginForm = props => {
         }
       };
 
-      const res = await axios.post('http://127.0.0.1/login', user, config);
+      const res = await axios.post('http://127.0.0.1/api/login', user, config);
       setResponse(res.data);
     } catch(e) {
+      const { msg } = e.response.data;
+      setAlert({type:'danger', msg});
+
       console.error(e.message);
     }
   };

@@ -1,7 +1,12 @@
-import React, { useState } from 'react';
-import axios from "axios";
+import React, { useState, useContext } from 'react';
+import axios from 'axios';
+
+import AlertContext from '../../context/alert/AlertContext';
 
 const RegisterForm = props => {
+  const alertContext = useContext(AlertContext);
+  const { setAlert } = alertContext;
+
   const { setResponse } = props;
 
   const [avatar, setAvatar] = useState(null);
@@ -38,9 +43,12 @@ const RegisterForm = props => {
         }
       };
 
-      const res = await axios.post('http://127.0.0.1/register', formData, config);
+      const res = await axios.post('http://127.0.0.1/api/register', formData, config);
       setResponse(res.data);
     } catch(e) {
+      const { msg } = e.response.data;
+      setAlert({type: 'danger', msg});
+
       console.error(e.message);
     }
   }

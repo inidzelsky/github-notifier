@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 
 import RegisterForm from '../forms/RegisterForm';
-import Response from './Response';
+import User from './User';
 
 const Register = () => {
   const [response, setResponse] = useState(null);
 
   return (response ?
-    <Response data={response}/> :
+    <User data={response}/> :
     <RegisterForm setResponse={setResponse}/>
     );
 };

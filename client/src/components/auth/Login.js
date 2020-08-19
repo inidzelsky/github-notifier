@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 
 import LoginForm from '../forms/LoginForm';
-import Response from './Response';
+import User from './User';
 
 const Login = () => {
   const [response, setResponse] = useState(null);
 
   return(
     response ?
-      <Response data={response} /> :
+      <User data={response} /> :
       <LoginForm setResponse={setResponse}/>
   );
 };

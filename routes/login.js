@@ -8,6 +8,6 @@ const { loginUser } =
 
 const router = new Router();
 
-router.post('api//login', loginUser);
+router.post('/api/login', loginUser);
 
 module.exports = router;
