@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Response = props => {
+const User = props => {
   const { data: { email, token, thumbnailUrl, avatarUrl } } = props;
 
   return (
@@ -28,4 +28,4 @@ const Response = props => {
   );
 };
 
-export default Response;
+export default User;
