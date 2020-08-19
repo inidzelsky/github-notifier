@@ -7,16 +7,20 @@ import {
 
 import '../styles/App.css';
 
+import AlertState from '../context/alert/AlertState';
+
 import Navbar from './layout/Navbar';
 import Login from './auth/Login';
 import Register from './auth/Register';
 import Send from './pages/Send';
+import Alerts from './layout/Alerts';
 
 const App = () => {
   return (
     <Router>
-      <div>
+      <AlertState>
         <Navbar />
+        <Alerts />
         <Switch>
           <Route path='/register'>
             <Register />
@@ -28,7 +32,7 @@ const App = () => {
             <Login />
           </Route>
         </Switch>
-      </div>
+      </AlertState>
     </Router>
   );
 };
