@@ -7,53 +7,46 @@ const nodemailer = require('nodemailer');
 const config = require(path.join(__dirname, '..', 'config'));
 const { githubToken, openWeatherKey, transporterOptions } = config;
 
-// Get helper functions
-const { handleError } = require(path.join(__dirname, '..', 'helpers', 'error'));
-
 // Get validator
 const validate = require(path.join(__dirname, '..', 'validators', 'send'));
 
 const sendController = async ctx => {
-  try {
-    const { usernames, text } = ctx.request.body;
+  const { usernames, text } = ctx.request.body;
 
-    // Request data validation
-    validate({ text, usernames }, ctx);
+  // Request data validation
+  validate({ text, usernames }, ctx);
 
-    // Fetch github email and location data by nickname
-    let users = await Promise.all(usernames.map(getUserInfo));
+  // Fetch github email and location data by nickname
+  let users = await Promise.all(usernames.map(u => getUserInfo(ctx, u)));
 
-    //Create user objects with the weather data
-    users = await Promise.all(users.map(async user => {
-      const { login, email, location } = user.data;
+  //Create user objects with the weather data
+  users = await Promise.all(users.map(async user => {
+    const { login, email, location } = user.data;
 
-      let weather = null;
-      if (email && location) {
-        const response = await getWeather(location);
-        weather = response ? response.weather : null;
-      }
+    let weather = null;
+    if (email && location) {
+      const response = await getWeather(location);
+      weather = response ? response.weather : null;
+    }
 
-      return {
-        login,
-        email,
-        location,
-        weather
-      };
-    }));
-    // Set transporter options
-    const transporter = nodemailer.createTransport(transporterOptions);
-
-    // Send emails and get the reports
-    const result = await Promise.all(users.map(user => sendEmail(transporter, user, text)));
-
-    // Return the sending reports
-    ctx.body = {
-      result
+    return {
+      login,
+      email,
+      location,
+      weather
     };
-  } catch(e) {
-    console.log(e);
-    handleError(e, ctx);
-  }
+  }));
+
+  // Set transporter options
+  const transporter = nodemailer.createTransport(transporterOptions);
+
+  // Send emails and get the reports
+  const result = await Promise.all(users.map(user => sendEmail(transporter, user, text)));
+
+  // Return the sending reports
+  ctx.body = {
+    result
+  };
 };
 
 // Function for email sending
@@ -89,7 +82,7 @@ const sendEmail = async (transporter, user, text) => {
 }
 
 // Function for fetching github user data
-const getUserInfo = async username => {
+const getUserInfo = async (ctx, username) => {
   try {
     const config = {
       headers: {

@@ -10,9 +10,6 @@ const bcrypt = require('bcryptjs');
 const config = require(path.join(__dirname, '..', 'config'));
 const { jwtSecret, multerStorage, avatarsPath, thumbnailsPath } = config;
 
-// Get helper functions
-const { handleError } = require(path.join(__dirname, '..', 'helpers', 'error'));
-
 // Get validator
 const validate = require(path.join(__dirname, '..', 'validators', 'register'));
 
@@ -28,8 +25,12 @@ const formatChecker =  (req, file, cb) => {
 
   if (extCheck && mimeCheck)
     cb(null, true);
-  else
-    cb('Invalid picture format');
+  else {
+    const e = new Error();
+    e.status = 422;
+    e.message = 'Invalid picture format';
+    cb(e);
+  }
 };
 
 const storage = multer.diskStorage(multerStorage);
@@ -39,60 +40,56 @@ const upload = multer({
 });
 
 const registerUser = async ctx => {
-  try {
-    const { body: { email, password }, file } = ctx.request;
+  const { body: { email, password }, file } = ctx.request;
 
-    //Request data validation
-    validate({ email, password, file }, ctx);
+  //Request data validation
+  validate({ email, password, file }, ctx);
 
-    // Create avatar and thumbnail file pathes
-    const ext = path.extname(avatarFileName);
-    const base = path.basename(avatarFileName, ext);
-    const thumbnailFileName = `${base}_thumb${ext}`;
+  // Create avatar and thumbnail file pathes
+  const ext = path.extname(avatarFileName);
+  const base = path.basename(avatarFileName, ext);
+  const thumbnailFileName = `${base}_thumb${ext}`;
 
-    // Create a thumbnail from the avatar
-    await thumb({
-      source: path.join(avatarsPath, avatarFileName),
-      destination: thumbnailsPath,
-      width: 100,
-      quiet: true
+  // Create a thumbnail from the avatar
+  await thumb({
+    source: path.join(avatarsPath, avatarFileName),
+    destination: thumbnailsPath,
+    width: 100,
+    quiet: true
+  });
+
+  // Generate a password hash
+  const salt = await bcrypt.genSalt(10);
+  const hashPassword = await bcrypt.hash(password, salt);
+
+  // Save user into the database
+  const user = new User(email, hashPassword, avatarFileName, thumbnailFileName);
+  const { userId } = await user.save();
+
+  // Give token
+  const payload = {
+    user: {
+      userId
+    }
+  };
+
+  const token = jwt.sign(
+    payload,
+    jwtSecret,
+    {
+      expiresIn: 360000
     });
 
-    // Generate a password hash
-    const salt = await bcrypt.genSalt(10);
-    const hashPassword = await bcrypt.hash(password, salt);
+  // Get user`s avatar url
+  const avatarUrl = path.join(ctx.request.host, avatarsPath, avatarFileName);
+  const thumbnailUrl = path.join(ctx.request.host, thumbnailsPath, thumbnailFileName);
 
-    // Save user into the database
-    const user = new User(email, hashPassword, avatarFileName, thumbnailFileName);
-    const { userId } = await user.save();
-
-    // Give token
-    const payload = {
-      user: {
-        userId
-      }
-    };
-
-    const token = jwt.sign(
-      payload,
-      jwtSecret,
-      {
-        expiresIn: 360000
-      });
-
-    // Get user`s avatar url
-    const avatarUrl = path.join(ctx.request.host, avatarsPath, avatarFileName);
-    const thumbnailUrl = path.join(ctx.request.host, thumbnailsPath, thumbnailFileName);
-
-    return ctx.body = {
-      token,
-      email,
-      avatarUrl,
-      thumbnailUrl
-    };
-  } catch(e) {
-    handleError(e, ctx);
-  }
+  return ctx.body = {
+    token,
+    email,
+    avatarUrl,
+    thumbnailUrl
+  };
 };
 
 module.exports = {
