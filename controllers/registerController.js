@@ -64,7 +64,7 @@ const registerUser = async ctx => {
 
   // Save user into the database
   const user = new User(email, hashPassword, avatarFileName, thumbnailFileName);
-  const { userId } = await user.save();
+  const { userId } = await user.save(ctx);
 
   // Give token
   const payload = {
