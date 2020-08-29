@@ -7,20 +7,16 @@ const { jwtSecret } = require(path.join(__dirname, '..', 'config'));
 
 const protectedMiddleware = async (ctx, next) => {
   try {
-    if (!ctx.request.body.token) {
-      ctx.status = 401;
-      return ctx.body = { msg: 'Token is absent' };
-    }
+    if (!ctx.request.body.token)
+      ctx.throw(401, 'Token is absent');
 
     const { token } = ctx.request.body;
     await jwt.verify(token, jwtSecret);
-
-    await next();
   } catch(e) {
-    console.log(e);
-    ctx.status = 401;
-    ctx.body = { msg: 'Token is wrong' };
+    ctx.throw(401, 'Token is wrong');
   }
+
+  await next();
 };
 
 module.exports = protectedMiddleware;

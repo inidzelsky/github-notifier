@@ -8,7 +8,7 @@ const bcrypt = require('bcryptjs');
 
 // Get config values
 const config = require(path.join(__dirname, '..', 'config'));
-const { jwtSecret, multerStorage, avatarsPath, thumbnailsPath } = config;
+const {jwtSecret, multerStorage, avatarsPath, thumbnailsPath} = config;
 
 // Get validator
 const validate = require(path.join(__dirname, '..', 'validators', 'register'));
@@ -17,7 +17,7 @@ const validate = require(path.join(__dirname, '..', 'validators', 'register'));
 const User = require(path.join(__dirname, '..', 'models', 'User'));
 
 // Set "multer" options
-const formatChecker =  (req, file, cb) => {
+const formatChecker = (req, file, cb) => {
   const filetypes = /png|gif|jpeg|jpg/;
   const extCheck = filetypes
     .test(path.extname(file.originalname).toLowerCase());
@@ -40,12 +40,13 @@ const upload = multer({
 });
 
 const registerUser = async ctx => {
-  const { body: { email, password }, file } = ctx.request;
+  const {body: {email, password}, file} = ctx.request;
 
   //Request data validation
-  validate({ email, password, file }, ctx);
+  validate({email, password, avatar: file}, ctx);
 
   // Create avatar and thumbnail file pathes
+  const avatarFileName = file.filename;
   const ext = path.extname(avatarFileName);
   const base = path.basename(avatarFileName, ext);
   const thumbnailFileName = `${base}_thumb${ext}`;
@@ -64,7 +65,7 @@ const registerUser = async ctx => {
 
   // Save user into the database
   const user = new User(email, hashPassword, avatarFileName, thumbnailFileName);
-  const { userId } = await user.save(ctx);
+  const {userId} = await user.save(ctx);
 
   // Give token
   const payload = {

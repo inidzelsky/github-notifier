@@ -10,7 +10,7 @@ const cors = require('@koa/cors');
 const app = new Koa();
 
 // Server side error handling
-app.on('error', e => console.error(e.message));
+app.on('error', e => console.log(e));
 
 //CORS
 app.use(cors());
