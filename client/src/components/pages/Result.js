@@ -18,11 +18,11 @@ const Result = props => {
           </tr>
         </thead>
         <tbody>
-        {result.map(u =>
-          (<tr>
-            <td>{u.username}</td>
-            <td>{u.msg}</td>
-          </tr>))}
+          { result.map(field =>
+              (<tr key={field.username}>
+                <td>{field.username}</td>
+                <td>{field.msg}</td>
+              </tr>) )}
         </tbody>
       </table>
     </div>

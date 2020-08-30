@@ -3,15 +3,14 @@ import {
   BrowserRouter as Router,
     Switch,
     Route
-} from "react-router-dom";
+} from 'react-router-dom';
 
 import '../styles/App.css';
 
-import AlertState from '../context/alert/AlertState';
+import { AlertState } from '../context/alert/AlertContext';
 
 import Navbar from './layout/Navbar';
-import Login from './auth/Login';
-import Register from './auth/Register';
+import Auth from './auth/Auth';
 import Send from './pages/Send';
 import Alerts from './layout/Alerts';
 
@@ -23,13 +22,13 @@ const App = () => {
         <Alerts />
         <Switch>
           <Route path='/register'>
-            <Register />
+            <Auth isLogin={false} />
           </Route>
           <Route path='/send'>
             <Send />
           </Route>
           <Route path='/'>
-            <Login />
+            <Auth isLogin={true} />
           </Route>
         </Switch>
       </AlertState>
