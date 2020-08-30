@@ -5,6 +5,7 @@ require('dotenv').config();
 
 const Koa = require('koa');
 const bodyParser = require('koa-bodyparser');
+const serve = require('koa-static');
 const cors = require('@koa/cors');
 
 const app = new Koa();
@@ -14,6 +15,9 @@ app.on('error', e => console.log(e));
 
 //CORS
 app.use(cors());
+
+//Static folder
+app.use(serve('./public'));
 
 // Body parser
 app.use(bodyParser());

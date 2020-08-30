@@ -3,12 +3,12 @@
 const path = require('path');
 
 module.exports = {
-  githubToken: process.env.GITHUBTOKEN, 
+  githubToken: process.env.GITHUBTOKEN,
   openWeatherKey: process.env.OPENWEATHERKEY,
   connectionString: process.env.CONNECTIONSTRING,
   jwtSecret: process.env.JWTSECRET,
-  avatarsPath: 'public/avatars',
-  thumbnailsPath: 'public/avatars/thumbnails',
+  avatarsPath: 'avatars',
+  thumbnailsPath: 'avatars/thumbnails',
   multerStorage: {
     destination: (req, file, cb) => cb(null, 'public/avatars'),
     filename: (req, file, cb) => {

@@ -53,8 +53,8 @@ const registerUser = async ctx => {
 
   // Create a thumbnail from the avatar
   await thumb({
-    source: path.join(avatarsPath, avatarFileName),
-    destination: thumbnailsPath,
+    source: path.join('public', avatarsPath, avatarFileName),
+    destination: path.join('public', thumbnailsPath),
     width: 100,
     quiet: true
   });
