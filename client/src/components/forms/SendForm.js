@@ -1,103 +1,115 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useCallback } from 'react';
 import axios from 'axios';
 
 import AlertContext from '../../context/alert/AlertContext';
 
-const SendForm = props => {
-  const alertContext = useContext(AlertContext);
-  const { setAlert } = alertContext;
-
-  const { setResponse } = props;
+const SendForm = ({ setResponse }) => {
+  const { setAlert } = useContext(AlertContext);
 
   const [token, setToken] = useState('');
   const [text, setText] = useState('');
-  const [username, setUsername] = useState('');
-  const [usernames, setUsernames] = useState([]);
-  const [currentUsername, setCurrentUsername] = useState(null);
+  const [usernames, setUsernames] = useState({
+    selectedUsernames: [],
+    inputUsername: '',
+    currentUsername
+  });
 
-  const onChange = cb => e => cb(e.target.value);
+  const { inputUsername, currentUsername, selectedUsernames } = usernames;
+
+  const handleInput = name => ({ target }) => {
+    const names = {
+      token: setToken,
+      text: setText,
+      username: value => setUsernames({ ...usernames, inputUsername: value })
+    };
+
+    const handler = names[name];
+    handler(target.value);
+  };
 
   const onSelectChange = e => {
     e.preventDefault();
 
-    setCurrentUsername(e.target.value);
-  }
+    setUsernames({ ...usernames, currentUsername: e.target.value });
+  };
 
   const onAddClick = e => {
     e.preventDefault();
 
-    if (username.trim() === '')
-      return;
+    if (inputUsername.trim() === '')
+      return setAlert({ type: 'danger', msg: 'Username can`t be an empty string' });
 
-    setUsernames([...usernames, username]);
-    setUsername('');
+    if (selectedUsernames.includes(inputUsername))
+      return setAlert({ type: 'danger', msg: 'Usernames should be unique' });
+
+    setUsernames({
+      ...usernames,
+      selectedUsernames: [...selectedUsernames, inputUsername],
+      inputUsername: ''
+    });
   };
 
   const onRemoveClick = e => {
     e.preventDefault();
 
-    if (currentUsername === null)
-      return;
+    if (!currentUsername)
+      return setAlert({ type: 'warning', msg: 'No username selected' });
 
-    const filteredUsernames = usernames.filter(val => val !== currentUsername);
-    setUsernames(filteredUsernames);
+    const filteredUsernames = selectedUsernames.filter(val => val !== currentUsername);
+    setUsernames({ ...usernames, selectedUsernames: filteredUsernames, currentUsername: undefined });
+  };
 
-    if (filteredUsernames.length)
-      setCurrentUsername(filteredUsernames[0]);
-    else
-      setCurrentUsername(null);
-  }
-
-  const onSubmit = async e => {
+  const onSubmitClb = async e => {
     try {
       e.preventDefault();
 
-      if (!token.trim() || !text.trim() || !usernames.length)
-        return;
+      if (!(token && text)) {
+        const msg = (!token ? 'Token' : 'Text') + ' is not provided';
+        return setAlert({ type: 'danger', msg });
+      }
 
-      const config = {
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      };
+      if (!selectedUsernames.length)
+        return setAlert({ type: 'danger', msg: 'Usernames list is empty' });
 
       const formData = {
         token,
         text,
-        usernames
+        usernames: selectedUsernames
       };
 
-      const res = await axios.post('http://127.0.0.1/api/send', formData, config);
-      setResponse(res.data);
+      const { data } = await axios.post('http://127.0.0.1/api/send', formData);
+      setResponse(data);
     } catch(e) {
       const { msg } = e.response.data;
-      setAlert({type: 'danger', msg});
+      setAlert({type: 'danger', msg });
 
       console.error(e.message);
     }
   };
 
+  const onSubmit = useCallback(onSubmitClb, [token, text, usernames]);
+
   return (
     <div className='container' style={{width: '750px'}}>
-      <h1>Send</h1>
+      <h1 className='text-center'>Send</h1>
       <form onSubmit={onSubmit}>
         <div className='form-group'>
           <label>Token</label>
-          <input type='text' name='token' value={token} className='form-control' onChange={onChange(setToken)}/>
+          <input type='text' name='token' value={token} className='form-control' onChange={handleInput('token')}/>
         </div>
         <div className='form-group'>
           <label>Text</label>
-          <input type='text' name='text' value={text} className='form-control' onChange={onChange(setText)} />
+          <input type='text' name='text' value={text} className='form-control' onChange={handleInput('text')} />
         </div>
         <label>Usernames</label>
         <div className='form-row'>
           <div className='form-group col-sm-6'>
             <select selected={currentUsername} onChange={onSelectChange} multiple className='custom-select' style={{height: '130px'}}>
-              {usernames.map(u => <option>{u}</option>)}
+              {selectedUsernames.map(u => <option key={u}>{u}</option>)}
             </select>
           </div>
           <div className='form-group col-sm-6'>
-            <input name='username' value={username} type='text' className='form-control mb-3' onChange={onChange(setUsername)}/>
+            <input name='username' value={inputUsername} type='text' className='form-control mb-3' onChange={handleInput('username')}/>
             <div className="btn-group-vertical btn-block">
               <button onClick={onAddClick} className='btn btn-dark'>Add username</button>
               <button onClick={onRemoveClick} className='btn btn-danger'>Remove username</button>

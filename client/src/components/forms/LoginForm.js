@@ -1,40 +1,29 @@
-import React, { useState, useContext } from 'react';
-import axios from "axios";
+import React, { useState, useContext, useCallback } from 'react';
+import axios from 'axios';
 
 import AlertContext from '../../context/alert/AlertContext';
 
-const LoginForm = props => {
-  const alertContext = useContext(AlertContext);
-  const { setAlert } = alertContext;
-
-  const { setResponse } = props;
+const LoginForm = ({ setResponse }) => {
+  const { setAlert } = useContext(AlertContext);
 
   const [user, setUser] = useState({
     email: '',
     password: ''
   });
 
-  const { email, password } = user;
+  const onChange = ({ target }) => setUser({...user, [target.name]: target.value});
 
-  const onChange = e => {
-    setUser({...user, [e.target.name]: e.target.value});
-  };
-
-  const onSubmit = async e => {
+  const onSubmitClb = async e => {
     try {
       e.preventDefault();
 
-      if (!email.trim() || !password.trim())
-        return;
+      if (!(user.password && user.email)) {
+        const msg = (!user.email ? 'Email' : 'Password') + ' is not provided';
+        return setAlert({ type: 'danger', msg });
+      }
 
-      const config = {
-        headers: {
-          "Content-Type": "application/json"
-        }
-      };
-
-      const res = await axios.post('http://127.0.0.1/api/login', user, config);
-      setResponse(res.data);
+      const { data } = await axios.post('http://127.0.0.1/api/login', user);
+      setResponse(data);
     } catch(e) {
       const { msg } = e.response.data;
       setAlert({type:'danger', msg});
@@ -43,17 +32,19 @@ const LoginForm = props => {
     }
   };
 
+  const onSubmit = useCallback(onSubmitClb, [user]);
+
   return(
     <div className={'container'} style={{width: '500px'}}>
       <h1 className='text-center'>Login</h1>
       <form onSubmit={onSubmit}>
         <div className='form-group'>
           <label>Email</label>
-          <input className={'form-control'} name="email" type="email" value={email}  onChange={onChange}/>
+          <input className={'form-control'} name="email" type="email" value={user.email} onChange={onChange}/>
         </div>
         <div className='form-group'>
           <label>Password</label>
-          <input className={'form-control'} name="password" type="password" value={password} onChange={onChange}/>
+          <input className={'form-control'} name="password" type="password" value={user.password} onChange={onChange}/>
         </div>
         <button type="submit" className={'btn btn-primary'}>Login</button>
       </form>

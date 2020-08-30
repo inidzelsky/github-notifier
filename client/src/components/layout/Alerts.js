@@ -5,12 +5,11 @@ import AlertContext from '../../context/alert/AlertContext';
 import Alert from './Alert';
 
 const Alerts = () => {
-  const alertContext = useContext(AlertContext);
-  const { alerts } = alertContext;
+  const { alerts } = useContext(AlertContext);
 
   return (
     <div className='container'>
-      {alerts.map(alert => <Alert alert={alert}/>)}
+      {alerts.map(alert => <Alert {...{key: alert.id, alert}}/>)}
     </div>
   );
 };

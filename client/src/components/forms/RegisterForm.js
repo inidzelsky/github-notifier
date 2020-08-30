@@ -1,13 +1,10 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useCallback } from 'react';
 import axios from 'axios';
 
 import AlertContext from '../../context/alert/AlertContext';
 
-const RegisterForm = props => {
-  const alertContext = useContext(AlertContext);
-  const { setAlert } = alertContext;
-
-  const { setResponse } = props;
+const RegisterForm = ({ setResponse }) => {
+  const { setAlert } = useContext(AlertContext);
 
   const [avatar, setAvatar] = useState(null);
   const [user, setUser] = useState({
@@ -15,36 +12,30 @@ const RegisterForm = props => {
     password: ''
   });
 
-  const { email, password } = user;
-
-  const onAuthChange = e => {
-    setUser({...user, [e.target.name]: e.target.value});
+  const onAuthChange = ({ target }) => {
+    setUser({...user, [target.name]: target.value});
   };
 
-  const onAvatarChange = e => {
-    setAvatar(e.target.files[0]);
+  const onAvatarChange = ({ target }) => {
+    setAvatar(target.files[0]);
   };
 
-  const onSubmit = async e => {
+  const onSubmitClb = async e => {
     try {
       e.preventDefault();
 
-      if (!avatar || !email.trim() || !password.trim())
-        return;
+      if (!(avatar && user.email && user.password)) {
+        const msg = (!avatar ? 'Avatar' : (!user.email ? 'Email' : 'Password')) + ' is not provided';
+        return setAlert({ type: 'danger', msg });
+      }
 
       const formData = new FormData();
       formData.append('avatar', avatar);
-      formData.append('email', email);
-      formData.append('password', password);
+      formData.append('email', user.email);
+      formData.append('password', user.password);
 
-      const config = {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      };
-
-      const res = await axios.post('http://127.0.0.1/api/register', formData, config);
-      setResponse(res.data);
+      const { data } = await axios.post('http://127.0.0.1/api/register', formData);
+      setResponse(data);
     } catch(e) {
       const { msg } = e.response.data;
       setAlert({type: 'danger', msg});
@@ -52,6 +43,8 @@ const RegisterForm = props => {
       console.error(e.message);
     }
   }
+
+  const onSubmit = useCallback(onSubmitClb, [avatar, user]);
 
   return (
     <div className='container' style={{width: '500px'}}>
@@ -66,11 +59,11 @@ const RegisterForm = props => {
         </div>
         <div className='form-group'>
           <label>Email</label>
-          <input name="email" type="email" value={email} className='form-control' onChange={onAuthChange}/>
+          <input name="email" type="email" value={user.email} className='form-control' onChange={onAuthChange}/>
         </div>
         <div className='form-group'>
           <label>Password</label>
-          <input name="password" type="password" value={password} className='form-control' onChange={onAuthChange}/>
+          <input name="password" type="password" value={user.password} className='form-control' onChange={onAuthChange}/>
         </div>
         <button type='submit' className='btn btn-primary'>Register</button>
       </form>

@@ -1,14 +1,11 @@
-import { SET_ALERT, REMOVE_ALERT } from '../types';
-
 export default (state, action) => {
-  switch (action.type) {
-    case SET_ALERT:
-      return [...state, action.payload];
+  const { type, payload } = action;
 
-    case REMOVE_ALERT:
-      return state.filter(alert => alert.id !== action.payload);
-
-    default:
-      return state;
+  const actions = {
+    SET_ALERT: [...state, payload],
+    REMOVE_ALERT: state.filter(alert => alert.id !== action.payload)
   };
+
+  const actionType = actions[type];
+  return actionType ? actionType : state;
 };
