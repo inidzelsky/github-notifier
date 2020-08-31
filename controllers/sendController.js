@@ -4,8 +4,7 @@ const axios = require('axios');
 const nodemailer = require('nodemailer');
 
 // Get config values
-const config = require(path.join(__dirname, '..', 'config'));
-const { githubToken, openWeatherKey, transporterOptions } = config;
+const { githubToken, openWeatherKey, transporterOptions } = require(path.join(__dirname, '..', 'config'));
 
 // Get validator
 const validate = require(path.join(__dirname, '..', 'validators', 'send'));
@@ -16,26 +15,11 @@ const sendController = async ctx => {
   // Request data validation
   validate({ text, usernames }, ctx);
 
-  // Fetch github email and location data by nickname
-  let users = await Promise.all(usernames.map(u => getUserInfo(ctx, u)));
+  // Fetch github email and location data by username
+  let users = await Promise.all(usernames.map(u => getUserInfo(u, ctx)));
 
   //Create user objects with the weather data
-  users = await Promise.all(users.map(async user => {
-    const { login, email, location } = user.data;
-
-    let weather = null;
-    if (email && location) {
-      const response = await getWeather(location);
-      weather = response ? response.weather : null;
-    }
-
-    return {
-      login,
-      email,
-      location,
-      weather
-    };
-  }));
+  users = await Promise.all(users.map(u => shapeData(u)));
 
   // Set transporter options
   const transporter = nodemailer.createTransport(transporterOptions);
@@ -49,8 +33,26 @@ const sendController = async ctx => {
   };
 };
 
+const shapeData = async user => {
+  const { login, email, location } = user.data;
+
+  let weather;
+  if (email && location) {
+    const response = await getWeather(location);
+    weather = response ? response.weather : undefined;
+  }
+
+  return {
+    login,
+    email,
+    location,
+    weather
+  };
+};
+
 // Function for email sending
-const sendEmail = async (transporter, user, text) => {
+const sendEmail = async (transporter, user, textMsg) => {
+  // Initial res object
   let res = {
     username: user.login
   };
@@ -60,29 +62,31 @@ const sendEmail = async (transporter, user, text) => {
     return res;
   }
 
-  let message = text;
-  if (user.weather) {
-    message += `\n\nThe weather in ${user.location} : ${user.weather[0].main}.`;
-  }
+  // Form user message
+  let weatherMsg;
+  if (user.weather)
+    weatherMsg = `\n\nThe weather in ${user.location} : ${user.weather[0].main}.`;
+
+  const fullMsg = textMsg + weatherMsg;
 
   const info = await transporter.sendMail({
     from: 'github.notifier0@gmail.com',
     to: user.email,
     subject: "Notifying",
-    text: message
+    text: fullMsg
   });
 
   if (info.rejected.length) {
     res.msg = `Not sent. Error occured`;
   } else {
-    res.msg = (message === text) ? 'Sent without weather info' : 'Sent with full info';
+    res.msg = weatherMsg ? 'Sent with full info' : 'Sent without weather info';
   }
 
   return res;
-}
+};
 
 // Function for fetching github user data
-const getUserInfo = async (ctx, username) => {
+const getUserInfo = async (username, ctx) => {
   try {
     const config = {
       headers: {
@@ -94,7 +98,7 @@ const getUserInfo = async (ctx, username) => {
     const res = await axios.get(url, config);
     return res;
   } catch(e) {
-    if (e.response && e.response.status === 404)
+    if (e.response.status === 404)
       ctx.throw(404, `User "${username} was not found"`);
 
     throw e;
@@ -104,7 +108,7 @@ const getUserInfo = async (ctx, username) => {
 // Function for getting the weather by location
 const getWeather = async city => {
   if (!city)
-    return null;
+    return;
 
   const config = {
     params: {
@@ -114,8 +118,8 @@ const getWeather = async city => {
   };
 
   try {
-    const res = await axios.get('http://api.openweathermap.org/data/2.5/weather', config);
-    return res.data;
+    const { data } = await axios.get('http://api.openweathermap.org/data/2.5/weather', config);
+    return data;
   } catch(e) {
     if (e.response.status !== 404)
       throw e;
