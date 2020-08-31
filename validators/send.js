@@ -1,19 +1,12 @@
 'use strict';
 
-const validator = require('validator');
+const path = require('path');
 
-const isUnique = array => {
-  for (const c of array) {
-    const filtered = array.filter(v => v !== c);
-    if (array.length - filtered.length > 1)
-      return false;
-  }
-
-  return true;
-};
+const { isEmpty, isUnique } =
+  require(path.join(__dirname, 'validationHelpers'));
 
 const validate = ({ text, usernames }, ctx) => {
-  if (validator.isEmpty(text))
+  if (isEmpty(text))
     ctx.throw(422, 'Text is absent');
 
   if (!usernames.length)
