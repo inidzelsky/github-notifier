@@ -64,8 +64,8 @@ const registerUser = async ctx => {
   const hashPassword = await bcrypt.hash(password, salt);
 
   // Save user into the database
-  const user = new User(email, hashPassword, avatarFileName, thumbnailFileName);
-  const {userId} = await user.save(ctx);
+  const userData = { email, avatarFileName, thumbnailFileName, password: hashPassword };
+  const { userId } = await User.save(userData, ctx);
 
   // Give token
   const payload = {
