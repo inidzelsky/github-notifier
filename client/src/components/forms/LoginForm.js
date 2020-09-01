@@ -40,7 +40,7 @@ const LoginForm = ({ setResponse }) => {
       <form onSubmit={onSubmit}>
         <div className='form-group'>
           <label>Email</label>
-          <input className={'form-control'} name="email" type="email" value={user.email} onChange={onChange}/>
+          <input className='form-control' name="email" type="email" value={user.email} onChange={onChange}/>
         </div>
         <div className='form-group'>
           <label>Password</label>
