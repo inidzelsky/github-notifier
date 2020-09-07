@@ -21,14 +21,16 @@ const Url = ({ label, value, type }) => {
   const onClick = e => {
     e.preventDefault();
 
-    const url = 'http://' + value;
+    const url = /http:\/\//.test(value) ? value :  'http://' + value;
     window.open(url, '_blank');
   };
 
   return (
     <div className='form-group'>
       <label>{label}</label>
-      <button onClick={onClick} className='btn btn-block p-0'><input {...{value, type}} className='form-control' disabled/></button>
+      <button onClick={onClick} className='btn btn-block p-0'>
+        <input {...{value, type}} className='form-control' disabled/>
+      </button>
     </div>
   );
 };
